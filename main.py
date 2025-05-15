@@ -1,8 +1,8 @@
-import requests
+import requests 
 from bs4 import BeautifulSoup
 from time import sleep
-import random
-
+import random 
+ 
 # Настройки
 USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -18,24 +18,28 @@ def get_random_headers():
     }
 
 
-def parse_pikabu(page_count=1):
+def parse_pikabu(page_count=1):   #функция для парсинга
     base_url = "https://pikabu.ru/hot"
     results = []
 
-    for page in range(1, page_count + 1):
+    for page in range(1, page_count + 1): 
         try:
-            url = f"{base_url}?page={page}" if page > 1 else base_url
+            url = f"{base_url}?page={page}" if page > 1 else base_url 
+            # тут пишется как выглядит url
             print(f"Парсинг страницы {url}")
-
+            # пишем в терминал, откуда парсим
             response = requests.get(url, headers=get_random_headers(), timeout=10)
+            # стучим на сайт через гет, даем url, просим зайти с любого браузера, ждем ответа 10 сек
             response.raise_for_status()
 
             soup = BeautifulSoup(response.text, 'html.parser')
+            # тут раскладываем response на текст как html файл для парсинга
             articles = soup.find_all('article', class_='story')
+            #ищем всё, что имеет класс "story
 
-            for article in articles:
+            for article in articles: 
                 try:
-                    title = article.find('h2', class_='story__title').text.strip()
+                    title = article.find('h2', class_='story__title').text.strip() 
                     link = "https://pikabu.ru" + article.find('a', class_='story__title-link')['href']
                     rating = article.find('div', class_='story__rating-count').text.strip()
                     comments = article.find('span', class_='story__comments-link-count').text.strip()
@@ -49,16 +53,17 @@ def parse_pikabu(page_count=1):
                         'author': author
                     })
                 except Exception as e:
+                    #собираем ошибки тут
                     print(f"Ошибка парсинга статьи: {e}")
                     continue
 
             sleep(random.uniform(1.5, 3.0))
-
+            #спим рандомно от 1.5 до 3 сек на всякий случай
         except Exception as e:
             print(f"Ошибка при обработке страницы {page}: {e}")
             break
 
-    return results
+    return results 
 
 
 if __name__ == "__main__":
